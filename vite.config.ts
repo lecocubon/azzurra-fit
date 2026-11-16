@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 // Ruta desde la que se sirve la app. Raiz por defecto; para publicar en una
-// subcarpeta (GitHub Pages): APP_BASE=/registro-arquero/ npm run build
+// subcarpeta (GitHub Pages): APP_BASE=/azzurra-fit/ npm run build
 const base = process.env.APP_BASE ?? '/';
 
 export default defineConfig({
