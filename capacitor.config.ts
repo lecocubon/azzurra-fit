@@ -2,10 +2,10 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'io.github.lecocubon.arquero',
-  appName: 'Arquero',
+  appName: 'Azzurra Fit',
   webDir: 'dist',
   android: {
-    backgroundColor: '#101310',
+    backgroundColor: '#0a1220',
   },
 };
 

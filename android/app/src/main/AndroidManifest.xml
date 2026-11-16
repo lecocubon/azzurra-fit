@@ -47,7 +47,7 @@
     -->
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
-    <!-- Health Connect: solo lo que Arquero lee y escribe. -->
+    <!-- Health Connect: solo lo que Azzurra Fit lee y escribe. -->
     <uses-permission android:name="android.permission.health.READ_BODY_FAT" />
     <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
     <uses-permission android:name="android.permission.health.READ_RESTING_HEART_RATE" />

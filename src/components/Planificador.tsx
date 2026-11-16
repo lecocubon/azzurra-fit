@@ -3,8 +3,10 @@ import { EQUIPOS, catalogoPorId, type Equipo } from '../data/biblioteca';
 import { db } from '../db/db';
 import { guardarPlanificador, guardarPrograma, semanaActual } from '../db/repo';
 import { useArquero } from '../estado/arquero';
+import { formatoRango } from '../lib/numeros';
 import { numeroMesociclo } from '../lib/periodizacion';
 import {
+  CONDICIONES,
   DEPORTES,
   DIAS_CORTOS,
   DIAS_SEMANA,
@@ -17,6 +19,7 @@ import {
   OBJETIVOS,
   RESPUESTAS_INICIALES,
   generarPrograma,
+  llevaCarrera,
   normalizarRespuestas,
   type Respuestas,
 } from '../lib/planificador';
@@ -38,11 +41,24 @@ export function escucharPlanificador(abrir: () => void): () => void {
 /** Lo que no se elige: el cuerpo siempre esta y "otro" no dice nada. */
 const EQUIPO_ELEGIBLE = EQUIPOS.filter((e) => e.id !== 'peso-corporal' && e.id !== 'otro');
 
-type Paso = 'objetivo' | 'deporte' | 'dias' | 'lugar' | 'equipo' | 'experiencia' | 'molestias' | 'rutina';
+type Paso = 'objetivo' | 'deporte' | 'condicion' | 'dias' | 'lugar' | 'equipo' | 'experiencia' | 'molestias' | 'rutina';
 
-/** La pregunta del deporte solo aparece si el objetivo es rendir en uno. */
+/**
+ * La pregunta del deporte solo aparece si el objetivo es rendir en uno, y la
+ * del estado fisico cuando la semana lleva carrera.
+ */
 function pasosPara(r: Respuestas): Paso[] {
-  return ['objetivo', ...(r.objetivo === 'deporte' ? (['deporte'] as const) : []), 'dias', 'lugar', 'equipo', 'experiencia', 'molestias', 'rutina'];
+  return [
+    'objetivo',
+    ...(r.objetivo === 'deporte' ? (['deporte'] as const) : []),
+    ...(llevaCarrera(r) ? (['condicion'] as const) : []),
+    'dias',
+    'lugar',
+    'equipo',
+    'experiencia',
+    'molestias',
+    'rutina',
+  ];
 }
 
 const BOTON_PRIMARIO =
@@ -201,6 +217,8 @@ export function Planificador({ previas, onCerrar }: Props) {
 
       {paso === 'inicio' && (
         <>
+          <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" className="mb-4 size-16" />
+          <p className="font-display text-[14px] font-bold tracking-[0.18em] text-accent uppercase">Azzurra Fit</p>
           <h3 className="mb-2 font-display text-[26px] leading-tight font-bold tracking-[0.02em] uppercase">Armemos tu rutina</h3>
           <p className="mb-3 text-[15px] leading-relaxed text-ink2">
             Unas preguntas cortas: qué buscas, qué días entrenas, con qué equipo cuentas y si algo te molesta. Con eso te
@@ -243,6 +261,29 @@ export function Planificador({ previas, onCerrar }: Props) {
         </Pregunta>
       )}
 
+      {paso === 'condicion' && (
+        <Pregunta
+          titulo="¿Cómo estás físicamente?"
+          ayuda="Define la carrera de la semana. Sé honesto: partir más suave y subir es mejor que lesionarse la primera semana."
+        >
+          <div role="radiogroup" className="mb-4">
+            {CONDICIONES.map((c) => (
+              <Opcion key={c.id} activa={r.condicion === c.id} titulo={c.nombre} detalle={c.detalle} onClick={() => cambiar({ condicion: c.id })} />
+            ))}
+          </div>
+          <p className="text-[13px] leading-relaxed text-ink3">
+            {r.condicion === 'baja'
+              ? 'Partes con caminata y trote alternados para armar la base, sin impacto de más en rodillas y tobillos.'
+              : r.condicion === 'regular'
+                ? 'Trote continuo e intervalos para aguantar el segundo tiempo.'
+                : r.objetivo === 'deporte'
+                  ? 'Sprints, cambios de dirección e intervalos cortos: la carrera de un partido.'
+                  : 'Intervalos y trote para seguir subiendo.'}
+            {r.objetivo === 'deporte' && ' Nunca la víspera ni el día del partido.'}
+          </p>
+        </Pregunta>
+      )}
+
       {paso === 'dias' && (
         <Pregunta titulo="¿Qué días entrenas?" ayuda={`Marca entre ${MIN_DIAS} y ${MAX_DIAS} días. Si puedes, deja uno de descanso entre medio.`}>
           <Semana marcados={r.diasSemana} onCambio={(diasSemana) => cambiar({ diasSemana })} maximo={MAX_DIAS} />
@@ -258,7 +299,7 @@ export function Planificador({ previas, onCerrar }: Props) {
           <div role="radiogroup" className="flex flex-wrap gap-2">
             {MINUTOS_POSIBLES.map((m) => (
               <Ficha key={m} rol="radio" activa={r.minutos === m} onClick={() => cambiar({ minutos: m })}>
-                {m === 75 ? '75 o más' : `${m} min`}
+                {m === 90 ? '90 o más' : `${m} min`}
               </Ficha>
             ))}
           </div>
@@ -339,7 +380,6 @@ export function Planificador({ previas, onCerrar }: Props) {
                 <ul className="mt-2 grid gap-1">
                   {s.ejercicios.map((e) => {
                     const info = catalogoPorId(e.id, catalogo);
-                    const unidad = info?.tipo === 'tiempo' ? ' s' : '';
                     return (
                       <li key={e.id} className="flex gap-2 text-[14px] leading-snug">
                         <span className="w-6 shrink-0 font-display font-bold text-accent">{e.bloque}</span>
@@ -348,8 +388,7 @@ export function Planificador({ previas, onCerrar }: Props) {
                           {e.principal && <span className="ml-1.5 text-[11px] font-semibold tracking-[0.06em] text-accent-ink uppercase">principal</span>}
                         </span>
                         <span className="shrink-0 text-ink3">
-                          {e.series}×{e.reps[0] === e.reps[1] ? e.reps[0] : `${e.reps[0]}–${e.reps[1]}`}
-                          {unidad}
+                          {e.series}×{formatoRango(e.reps, info?.tipo ?? 'carga')}
                         </span>
                       </li>
                     );

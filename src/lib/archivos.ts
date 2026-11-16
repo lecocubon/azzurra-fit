@@ -3,12 +3,12 @@ import { esAppAndroid } from './salud';
 /**
  * Guardar archivos en el telefono. La app nativa no puede usar `<a download>`
  * y el menu de compartir depende de que haya una app que reciba el archivo,
- * asi que las copias se escriben directo en Documentos/Arquero.
+ * asi que las copias se escriben directo en Documentos/AzzurraFit.
  */
 
-const CARPETA = 'Arquero';
+const CARPETA = 'AzzurraFit';
 
-/** Guarda el archivo en Documentos/Arquero y devuelve la ruta para mostrar. */
+/** Guarda el archivo en Documentos/AzzurraFit y devuelve la ruta para mostrar. */
 export async function guardarEnDocumentos(nombre: string, contenido: string): Promise<string> {
   const { Directory, Encoding, Filesystem } = await import('@capacitor/filesystem');
   const escribir = (directory: (typeof Directory)[keyof typeof Directory]) =>
@@ -27,7 +27,7 @@ export async function guardarEnDocumentos(nombre: string, contenido: string): Pr
   }
 }
 
-/** file:///storage/emulated/0/Documents/Arquero/x.json -> Documentos/Arquero/x.json */
+/** file:///storage/emulated/0/Documents/AzzurraFit/x.json -> Documentos/AzzurraFit/x.json */
 function rutaLegible(uri: string): string {
   return decodeURIComponent(uri)
     .replace(/^file:\/\//, '')
@@ -48,7 +48,7 @@ export async function compartirArchivo(nombre: string, contenido: string): Promi
     directory: Directory.Cache,
     encoding: Encoding.UTF8,
   });
-  await Share.share({ title: nombre, files: [uri], dialogTitle: 'Compartir respaldo de Arquero' });
+  await Share.share({ title: nombre, files: [uri], dialogTitle: 'Compartir respaldo de Azzurra Fit' });
 }
 
 /** Descarga del navegador. Solo sirve en la version web. */

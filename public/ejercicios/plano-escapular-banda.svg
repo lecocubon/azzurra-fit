@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 240" width="360" height="240" role="img" aria-label="Visto desde arriba: el brazo sube por la diagonal de la paleta, a 30 grados">
   <style>
-    .izq { font: 700 14px system-ui, sans-serif; fill: #1E6B48; text-anchor: start }
-    .der { font: 700 14px system-ui, sans-serif; fill: #1E6B48; text-anchor: end }
-    .cen { font: 700 14px system-ui, sans-serif; fill: #1E6B48; text-anchor: middle }
+    .izq { font: 700 14px system-ui, sans-serif; fill: #1D64B5; text-anchor: start }
+    .der { font: 700 14px system-ui, sans-serif; fill: #1D64B5; text-anchor: end }
+    .cen { font: 700 14px system-ui, sans-serif; fill: #1D64B5; text-anchor: middle }
     .mal { font: 700 14px system-ui, sans-serif; fill: #c4634f; text-anchor: middle }
     .pie { font: 400 13px system-ui, sans-serif; fill: #6f7c75; text-anchor: middle }
   </style>
@@ -12,7 +12,7 @@
   <text class="cen" x="218" y="46">FRENTE</text>
   <path d="M218.0 134.0 L318.0 134.0" stroke="#c9d2cc" stroke-width="3" stroke-dasharray="7 7" stroke-linecap="round" fill="none" />
   <text class="der" x="310" y="160">COSTADO</text>
-  <path d="M284.2 101.8 L285.2 101.0 L286.0 99.8 L286.4 98.5 L286.3 97.1 L285.8 95.8 L285.0 94.8 L283.8 94.0 L282.5 93.6 L281.1 93.7 L279.8 94.2 L215.1 128.8 L213.6 130.0 L212.6 131.5 L212.1 133.3 L212.2 135.2 L212.8 136.9 L214.0 138.4 L215.5 139.4 L217.3 139.9 L219.2 139.8 L220.9 139.2 Z" fill="#1E6B48" />
+  <path d="M284.2 101.8 L285.2 101.0 L286.0 99.8 L286.4 98.5 L286.3 97.1 L285.8 95.8 L285.0 94.8 L283.8 94.0 L282.5 93.6 L281.1 93.7 L279.8 94.2 L215.1 128.8 L213.6 130.0 L212.6 131.5 L212.1 133.3 L212.2 135.2 L212.8 136.9 L214.0 138.4 L215.5 139.4 L217.3 139.9 L219.2 139.8 L220.9 139.2 Z" fill="#1D64B5" />
   <text class="cen" x="180" y="200">30°: justo por la mitad</text>
   <text class="pie" x="180" y="234">Visto desde arriba: esa diagonal es tu paleta</text>
 </svg>

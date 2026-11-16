@@ -44,7 +44,7 @@ export function Avisos() {
           key={a.id}
           className={`max-w-[440px] rounded-xl px-4 py-2.5 text-center text-[14px] font-semibold shadow-lg ${
             a.tono === 'record'
-              ? 'bg-accent text-on-accent'
+              ? 'bg-gold text-on-gold'
               : a.tono === 'error'
                 ? 'bg-warn text-on-accent'
                 : 'bg-ink text-ground'

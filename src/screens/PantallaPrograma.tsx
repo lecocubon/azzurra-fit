@@ -14,6 +14,7 @@ import { FormEjercicioPropio } from '../components/FormEjercicioPropio';
 import { ListaEjercicios } from '../components/ListaEjercicios';
 import { formatoSeries, revisarCobertura, type Cobertura, type Grupo } from '../lib/cobertura';
 import { descansoDe, formatoReloj } from '../lib/descanso';
+import { formatoRango } from '../lib/numeros';
 import { evitadosPor } from '../lib/planificador';
 import { finMesociclo, inicioMesociclo, numeroMesociclo } from '../lib/periodizacion';
 import {
@@ -355,8 +356,7 @@ function EditorSesion({ sesionId, todas, onCerrar }: { sesionId: string; todas: 
               <span className="min-w-0 flex-1">
                 <span className="block text-[14.5px] leading-snug font-semibold text-ink">{e.nombre}</span>
                 <span className="block text-[12.5px] text-ink3">
-                  {e.series} × {e.reps[0] === e.reps[1] ? e.reps[0] : `${e.reps[0]}–${e.reps[1]}`}
-                  {e.tipo === 'tiempo' ? ' s' : ''}
+                  {e.series} × {formatoRango(e.reps, e.tipo)}
                   {e.tipo === 'carga' ? ` · RIR ${e.rirFijo ?? (e.principal ? 'fase' : e.rirObjetivo)}` : ''}
                   {` · ⏱ ${formatoReloj(descansoDe(e, programa) * 1000)}`}
                 </span>

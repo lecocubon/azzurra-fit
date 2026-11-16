@@ -86,7 +86,7 @@ function PanelAvisos() {
             </button>
             {rechazado && (
               <p className="mt-2 text-[12.5px] leading-snug text-ink3">
-                Si no aparece el permiso, actívalo en Ajustes del teléfono → Aplicaciones → Arquero →
+                Si no aparece el permiso, actívalo en Ajustes del teléfono → Aplicaciones → Azzurra Fit →
                 Notificaciones.
               </p>
             )}
@@ -183,7 +183,7 @@ export function PantallaDatos({ semana, todas, sesiones, mediciones }: Props) {
       <p className="mb-3 text-[13.5px] leading-relaxed text-ink2">
         Todo vive solo en este teléfono. Guarda una copia de vez en cuando: es tu única copia de
         seguridad.{' '}
-        {esAppAndroid() && 'Las copias quedan en la carpeta Documentos/Arquero, y las abres desde Mis Archivos.'}
+        {esAppAndroid() && 'Las copias quedan en la carpeta Documentos/AzzurraFit, y las abres desde Mis Archivos.'}
       </p>
 
       {esAppAndroid() ? (
@@ -213,7 +213,7 @@ export function PantallaDatos({ semana, todas, sesiones, mediciones }: Props) {
             className={PRINCIPAL}
             onClick={() => {
               void armarRespaldo()
-                .then((json) => guardarEnDocumentos(`registro-arquero-${sello()}.json`, json))
+                .then((json) => guardarEnDocumentos(`azzurra-fit-${sello()}.json`, json))
                 .then((ruta) => avisar(`Copia guardada en ${ruta}`))
                 .catch(() => setError('No se pudo guardar la copia en el teléfono.'));
             }}
@@ -227,7 +227,7 @@ export function PantallaDatos({ semana, todas, sesiones, mediciones }: Props) {
           className={BOTON}
           onClick={() => {
             void armarRespaldo()
-              .then((json) => exportarArchivo(`registro-arquero-${sello()}.json`, json, 'application/json'))
+              .then((json) => exportarArchivo(`azzurra-fit-${sello()}.json`, json, 'application/json'))
               .then(() => avisar(esAppAndroid() ? 'JSON compartido.' : 'JSON exportado.'))
               .catch((e: unknown) => {
                 // Cerrar el menu de compartir sin elegir destino tambien llega aca.

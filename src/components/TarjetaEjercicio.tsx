@@ -17,6 +17,7 @@ import {
 } from '../db/repo';
 import { useArquero } from '../estado/arquero';
 import { descansoDe, formatoReloj } from '../lib/descanso';
+import { formatoRango } from '../lib/numeros';
 import { planSemana } from '../lib/periodizacion';
 import { incrementoSugerido } from '../lib/progresion';
 import { sugerirCarga } from '../lib/sugerencia';
@@ -138,9 +139,7 @@ export function TarjetaEjercicio({ semana, sesionId, ejercicio, registros, todas
   const sobraUltima =
     filas > plan.series && !tieneDatos(registros.get(idSerie(semana, sesionId, ejercicio.id, filas, tipoSerie)));
 
-  const rango =
-    ejercicio.reps[0] === ejercicio.reps[1] ? `${ejercicio.reps[0]}` : `${ejercicio.reps[0]}–${ejercicio.reps[1]}`;
-  const unidad = ejercicio.tipo === 'tiempo' ? ' s' : '';
+  const rango = formatoRango(ejercicio.reps, ejercicio.tipo);
   const lado = ejercicio.porLado ? ' por lado' : '';
 
   const marcar = async (serie: number, anterior?: RegistroSerie) => {
@@ -236,7 +235,6 @@ export function TarjetaEjercicio({ semana, sesionId, ejercicio, registros, todas
 
       <p className="px-3.5 pl-[47px] text-[12.5px] text-ink3">
         {plan.series} × {rango}
-        {unidad}
         {lado}
         {ejercicio.tipo === 'carga' ? ` · RIR ${plan.rirObjetivo}` : ''}
         {descanso > 0 ? ` · ⏱ ${formatoReloj(descanso * 1000)}` : ''}

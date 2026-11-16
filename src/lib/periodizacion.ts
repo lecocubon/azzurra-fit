@@ -69,7 +69,8 @@ export function planSemana(
   // La movilidad no se descarga ni se acumula: siempre las mismas series.
   const factor = ejercicio.tipo === 'movilidad' ? 1 : (fase.factorSeries ?? 1);
   const extra = fase.seriesExtra?.[ejercicio.tipo] ?? 0;
-  const minimo = fase.seriesMinimas ?? 1;
+  // El minimo de la descarga nunca sube un ejercicio por encima de sus series: un trote de una serie queda en una.
+  const minimo = Math.min(ejercicio.series, fase.seriesMinimas ?? 1);
   const series = Math.max(minimo, Math.round(ejercicio.series * factor)) + extra;
 
   // Prioridad: la fase con rirTodos manda sobre todo (descarga), luego el RIR

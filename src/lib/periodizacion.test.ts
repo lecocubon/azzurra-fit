@@ -149,6 +149,13 @@ describe('planSemana (semana, ejercicio) => series y RIR', () => {
   });
 });
 
+describe('descarga', () => {
+  it('nunca sube un ejercicio por encima de sus series', () => {
+    const trote = { ...ejercicioPorId('press-banca')!, id: 'trote', tipo: 'tiempo' as const, series: 1 };
+    expect(planSemana(8, trote).series).toBe(1);
+  });
+});
+
 describe('programaDeFabrica', () => {
   it('hasta la semana 8 entrega el primer mesociclo y desde la 9 el segundo', () => {
     expect(programaDeFabrica(1)).toBe(PROGRAMA_BASE);

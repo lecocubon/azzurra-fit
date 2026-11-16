@@ -126,10 +126,38 @@ describe('planificador', () => {
     expect(conPartido?.ejercicios.some((e) => tipo(e.id) === 'salto')).toBe(false);
   });
 
+  it('la carrera sigue el estado fisico y nunca cae la vispera ni el dia del partido', () => {
+    const carrera = (r: Respuestas) => generarPrograma(r, BIBLIOTECA).sesiones.flatMap((s) => s.ejercicios.filter((e) => CANDIDATOS.aerobicoBase.concat(CANDIDATOS.aerobico, CANDIDATOS.intervalos, CANDIDATOS.velocidad).includes(e.id)).map((e) => ({ dia: s.nombre, id: e.id })));
+    const futbol = { objetivo: 'deporte' as const, deporte: 'futbol' as const, diasSemana: [0, 2, 3, 4], partidos: [5] };
+    const baja = carrera(con({ ...futbol, condicion: 'baja' }));
+    expect(baja.map((c) => c.id)).toContain('caminata-trote');
+    expect(baja.map((c) => c.id)).not.toContain('sprints-repetidos');
+    const buena = carrera(con({ ...futbol, condicion: 'buena' }));
+    expect(buena.map((c) => c.id)).toContain('sprints-repetidos');
+    expect([...baja, ...buena].some((c) => c.dia === 'Viernes')).toBe(false);
+    expect(carrera(con({ objetivo: 'deporte', deporte: 'running', condicion: 'baja' }))).toEqual([]);
+    expect(carrera(con({ objetivo: 'musculo' }))).toEqual([]);
+    expect(carrera(con({ ...futbol, condicion: 'regular', molestias: ['rodilla'] })).every((c) => c.id === 'bici-intervalos')).toBe(true);
+  });
+
+  it('el trote de una serie larga queda en una sola serie', () => {
+    const p = generarPrograma(con({ objetivo: 'grasa', condicion: 'baja' }), BIBLIOTECA);
+    const trote = p.sesiones.flatMap((s) => s.ejercicios).find((e) => e.id === 'caminata-trote');
+    expect(trote?.series).toBe(1);
+    expect(trote?.reps).toEqual([900, 1500]);
+  });
+
+  it('de 30 a 90 minutos cambia cuanto cabe en la sesion', () => {
+    const n = (minutos: number) => generarPrograma(con({ minutos, ...dias(4) }), BIBLIOTECA).sesiones[0]?.ejercicios.length ?? 0;
+    expect(n(30)).toBeLessThan(n(60));
+    expect(n(60)).toBeLessThan(n(90));
+  });
+
   it('completa respuestas de la version anterior, que guardaba solo la cantidad de dias', () => {
     const r = normalizarRespuestas({ objetivo: 'fuerza', dias: 4 } as Partial<Respuestas> & { dias: number });
     expect(r.diasSemana).toEqual(diasSugeridos(4));
     expect(r.partidos).toEqual([]);
+    expect(r.condicion).toBe('regular');
   });
 
   it('los principales siguen la fase y el programa arranca donde se le pide', () => {

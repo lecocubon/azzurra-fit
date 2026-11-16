@@ -31,7 +31,7 @@ const PRINCIPAL =
   'h-12 w-full rounded-[11px] bg-accent font-display text-[16px] font-bold tracking-[0.1em] text-on-accent uppercase disabled:opacity-50';
 
 function mensajeNoDisponible(motivo?: string): string {
-  if (motivo === 'web') return 'La conexión con el reloj funciona solo en la app Android de Arquero, no en la versión web.';
+  if (motivo === 'web') return 'La conexión con el reloj funciona solo en la app Android de Azzurra Fit, no en la versión web.';
   if (motivo === 'sin-instalar') return 'Health Connect no está instalado en este teléfono.';
   if (motivo === 'actualizar') return 'Health Connect necesita actualizarse desde Play Store.';
   return 'Health Connect no está disponible en este teléfono.';
@@ -62,7 +62,7 @@ export function PanelReloj({ semana, sesiones }: { semana: number; sesiones: Reg
         ) : (
           <>
             <p className="mb-2 text-[13.5px] leading-relaxed text-ink2">
-              Samsung Health comparte con Health Connect lo que mide tu reloj o pulsera. Arquero lee peso, % de
+              Samsung Health comparte con Health Connect lo que mide tu reloj o pulsera. Azzurra Fit lee peso, % de
               grasa, pulso y sueño, y guarda tus sesiones como entrenamientos de fuerza.
             </p>
             <ul className="mb-3 grid grid-cols-2 gap-x-3 gap-y-1 text-[13px]">
@@ -197,7 +197,7 @@ export function RelojSesion({ semana, sesionId, nombreSesion, registros, meta, n
         version: Date.now(),
         inicio: new Date(inicio).toISOString(),
         fin: new Date(Math.max(fin, inicio + 60_000)).toISOString(),
-        titulo: `Arquero · ${nombreSesion} (semana ${semana})`,
+        titulo: `Azzurra Fit · ${nombreSesion} (semana ${semana})`,
         notas: notas || undefined,
       });
       const id = idSesion(semana, sesionId);

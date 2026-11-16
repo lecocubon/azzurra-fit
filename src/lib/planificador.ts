@@ -14,6 +14,7 @@ export type Experiencia = 'nuevo' | 'intermedio' | 'avanzado';
 export type Lugar = 'gimnasio' | 'gimnasio-basico' | 'casa' | 'sin-equipo';
 export type Molestia = 'hombro' | 'rodilla' | 'lumbar' | 'muneca';
 export type Deporte = 'futbol' | 'arquero' | 'running' | 'salto' | 'raqueta' | 'combate' | 'ciclismo' | 'otro';
+export type Condicion = 'baja' | 'regular' | 'buena';
 
 export interface Respuestas {
   objetivo: Objetivo;
@@ -28,6 +29,8 @@ export interface Respuestas {
   deporte: Deporte;
   /** Dias de partido o competencia: ordenan la semana para llegar fresco. */
   partidos: number[];
+  /** Estado fisico: decide la carrera de la semana (deporte, bajar grasa y salud). */
+  condicion: Condicion;
 }
 
 export const OBJETIVOS: { id: Objetivo; nombre: string; detalle: string }[] = [
@@ -48,6 +51,18 @@ export const DEPORTES: { id: Deporte; nombre: string; corto: string; detalle: st
   { id: 'ciclismo', nombre: 'Ciclismo', corto: 'Ciclismo', detalle: 'Pierna a una pierna y un tronco que aguante la postura.' },
   { id: 'otro', nombre: 'Otro deporte', corto: 'Rendimiento', detalle: 'Fuerza general con saltos en todas las direcciones.' },
 ];
+
+export const CONDICIONES: { id: Condicion; nombre: string; detalle: string }[] = [
+  { id: 'baja', nombre: 'Fuera de forma', detalle: 'Me ahogo rápido o hace tiempo que no corro.' },
+  { id: 'regular', nombre: 'Regular', detalle: 'Aguanto, pero el segundo tiempo me cuesta.' },
+  { id: 'buena', nombre: 'Buena', detalle: 'Juego el partido completo sin problemas.' },
+];
+
+/** Objetivos en que la semana suma carrera; fuerza y musculo no la necesitan. */
+export function llevaCarrera(r: Pick<Respuestas, 'objetivo' | 'deporte'>): boolean {
+  if (r.objetivo === 'deporte') return r.deporte !== 'running' && r.deporte !== 'ciclismo';
+  return r.objetivo === 'grasa' || r.objetivo === 'salud';
+}
 
 export const EXPERIENCIAS: { id: Experiencia; nombre: string; detalle: string }[] = [
   { id: 'nuevo', nombre: 'Estoy empezando', detalle: 'Menos de 6 meses entrenando con pesas, o mucho tiempo parado.' },
@@ -84,7 +99,7 @@ const DIAS_ID = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 
 
 export const MIN_DIAS = 2;
 export const MAX_DIAS = 5;
-export const MINUTOS_POSIBLES = [45, 60, 75] as const;
+export const MINUTOS_POSIBLES = [30, 45, 60, 75, 90] as const;
 
 /** Reparto con al menos un dia de por medio cuando se puede. */
 export function diasSugeridos(n: number): number[] {
@@ -102,6 +117,7 @@ export const RESPUESTAS_INICIALES: Respuestas = {
   molestias: [],
   deporte: 'futbol',
   partidos: [],
+  condicion: 'regular',
 };
 
 const diasValidos = (d: unknown): number[] =>
@@ -116,7 +132,7 @@ export function normalizarRespuestas(r: Partial<Respuestas> & { dias?: number })
 
 // ---------------------------------------------------------------- patrones
 
-type Rol = 'principal' | 'basico' | 'accesorio' | 'aislado' | 'core' | 'salto' | 'manguito' | 'condicion' | 'prevencion';
+type Rol = 'principal' | 'basico' | 'accesorio' | 'aislado' | 'core' | 'salto' | 'manguito' | 'carrera' | 'prevencion';
 
 export type Patron =
   | 'rodilla'
@@ -150,7 +166,10 @@ export type Patron =
   | 'tobillo'
   | 'rotacion'
   | 'cuello'
-  | 'condicion';
+  | 'aerobicoBase'
+  | 'aerobico'
+  | 'intervalos'
+  | 'velocidad';
 
 /** Candidatos por patron, del preferido al de reserva. Los ultimos sirven sin equipo. */
 export const CANDIDATOS: Record<Patron, string[]> = {
@@ -185,7 +204,10 @@ export const CANDIDATOS: Record<Patron, string[]> = {
   tobillo: ['tibial-pared', 'talones-una-pierna', 'talones-banda'],
   rotacion: ['pallof', 'lenador-polea', 'levantamiento-polea', 'navaja-lateral'],
   cuello: ['cuello-isometrico-frente', 'cuello-isometrico-lados'],
-  condicion: ['swing-kettlebell', 'paseo-granjero', 'thruster-kettlebell', 'escaladores'],
+  aerobicoBase: ['caminata-trote', 'bici-intervalos'],
+  aerobico: ['trote-continuo', 'bici-intervalos'],
+  intervalos: ['intervalos-4x4', 'intervalos-15-15', 'bici-intervalos'],
+  velocidad: ['sprints-repetidos', 'cambios-direccion'],
 };
 
 /** Piden tecnica: a quien empieza se le dan solo si no hay otra opcion. */
@@ -195,14 +217,17 @@ const EXIGENTES = new Set(['sentadilla-barra', 'dominadas', 'press-militar-barra
 const EVITAR: Record<Molestia, Set<string>> = {
   hombro: new Set([
     'press-banca', 'press-militar-barra', 'press-hombro-pie', 'press-banca-inclinado-barra', 'fondos-maquina', 'fondos-banco',
-    'dominadas', 'press-kettlebell-militar', 'thruster-kettlebell', 'lanzamiento-sobre-cabeza', 'golpe-balon-suelo', 'golpe-balon-una-mano',
+    'dominadas', 'press-kettlebell-militar', 'lanzamiento-sobre-cabeza', 'golpe-balon-suelo', 'golpe-balon-una-mano',
   ]),
-  rodilla: new Set(['sentadilla-barra', 'sentadilla-peso-corporal', 'zancada-atg', 'zancadas-mancuernas', 'subida-cajon', 'nordico']),
+  rodilla: new Set([
+    'sentadilla-barra', 'sentadilla-peso-corporal', 'zancada-atg', 'zancadas-mancuernas', 'subida-cajon', 'nordico',
+    'trote-continuo', 'intervalos-4x4', 'intervalos-15-15', 'sprints-repetidos', 'cambios-direccion',
+  ]),
   lumbar: new Set([
     'sentadilla-barra', 'peso-muerto-rumano', 'peso-muerto-piernas-rectas', 'remo-mancuernas', 'remo-polea-de-pie',
-    'press-militar-barra', 'press-hombro-pie', 'swing-kettlebell', 'thruster-kettlebell', 'giro-balon-completo',
+    'press-militar-barra', 'press-hombro-pie', 'giro-balon-completo',
   ]),
-  muneca: new Set(['press-banca', 'curl-barra-z', 'press-cerrado-mancuernas', 'flexiones', 'flexiones-abiertas', 'flexiones-pliometricas', 'escaladores']),
+  muneca: new Set(['press-banca', 'curl-barra-z', 'press-cerrado-mancuernas', 'flexiones', 'flexiones-abiertas', 'flexiones-pliometricas']),
 };
 
 /** Ids que no se proponen a quien marco esas molestias. */
@@ -377,9 +402,70 @@ function ordenarSemana(plantillas: Plantilla[], dias: number[], partidos: Readon
 
 /** Ejercicios por sesion segun los minutos; saltos, manguito y prevencion son cortos y no cuentan. */
 function cupoPorMinutos(minutos: number): number {
+  if (minutos <= 30) return 4;
   if (minutos <= 45) return 5;
   if (minutos <= 60) return 6;
-  return 8;
+  if (minutos <= 75) return 8;
+  return 9;
+}
+
+// ---------------------------------------------------------------- carrera
+
+/**
+ * Carrera de la semana segun el estado fisico, en orden de prioridad. Fuera
+ * de forma se construye la base aerobica con caminata y trote; con estado
+ * regular se suman intervalos; en buen estado, velocidad e intervalos cortos.
+ * El arquero corre poco y en piques: le toca velocidad antes que fondo.
+ */
+function carreraDeLaSemana(r: Respuestas): Patron[] {
+  if (!llevaCarrera(r)) return [];
+  const arquero = r.objetivo === 'deporte' && r.deporte === 'arquero';
+  const deporte = r.objetivo === 'deporte';
+  const tabla: Record<Condicion, Patron[]> = arquero
+    ? { baja: ['aerobicoBase', 'aerobicoBase'], regular: ['velocidad', 'aerobico'], buena: ['velocidad', 'velocidad'] }
+    : deporte
+      ? { baja: ['aerobicoBase', 'aerobicoBase', 'aerobicoBase'], regular: ['intervalos', 'aerobico'], buena: ['velocidad', 'intervalos'] }
+      : r.objetivo === 'grasa'
+        ? { baja: ['aerobicoBase', 'aerobicoBase', 'aerobicoBase'], regular: ['aerobico', 'intervalos', 'aerobico'], buena: ['intervalos', 'aerobico', 'intervalos'] }
+        : { baja: ['aerobicoBase', 'aerobicoBase'], regular: ['aerobico', 'aerobico'], buena: ['aerobico', 'intervalos'] };
+  return tabla[r.condicion];
+}
+
+/** Series, duracion en segundos y pausa de cada ejercicio de carrera. */
+const RECETA_CARRERA: Record<string, { series: number; reps: [number, number]; descanso: number }> = {
+  'caminata-trote': { series: 1, reps: [900, 1500], descanso: 0 },
+  'trote-continuo': { series: 1, reps: [1200, 1800], descanso: 0 },
+  'intervalos-4x4': { series: 4, reps: [240, 240], descanso: 180 },
+  'intervalos-15-15': { series: 10, reps: [15, 15], descanso: 15 },
+  'sprints-repetidos': { series: 6, reps: [4, 6], descanso: 60 },
+  'cambios-direccion': { series: 6, reps: [5, 7], descanso: 60 },
+  'bici-intervalos': { series: 8, reps: [30, 30], descanso: 30 },
+};
+
+/** Lo largo (fondo, intervalos) se come mas tiempo de pesas que unos piques. */
+function tiempoQueOcupa(patron: Patron, minutos: number): number {
+  if (patron === 'velocidad') return minutos <= 45 ? 1 : 0;
+  return minutos <= 45 ? 2 : 1;
+}
+
+/**
+ * Reparte la carrera en las sesiones: nunca el dia del partido ni la vispera,
+ * la velocidad en dias de pierna (con las piernas frescas, al inicio) y el
+ * fondo de preferencia en dias de torso.
+ */
+function repartirCarrera(plan: Patron[], tipos: TipoSesion[], bloqueados: boolean[]): (Patron | null)[] {
+  const asignado: (Patron | null)[] = tipos.map(() => null);
+  const preferencia = (patron: Patron, t: TipoSesion) => {
+    const orden: TipoSesion[] = patron === 'velocidad' ? ['pierna', 'completo', 'torso', 'brazos'] : ['torso', 'brazos', 'completo', 'pierna'];
+    return orden.indexOf(t);
+  };
+  for (const patron of plan) {
+    const libres = tipos.map((t, i) => ({ t, i })).filter(({ i }) => !bloqueados[i] && asignado[i] === null);
+    libres.sort((a, b) => preferencia(patron, a.t) - preferencia(patron, b.t) || a.i - b.i);
+    const elegido = libres[0];
+    if (elegido) asignado[elegido.i] = patron;
+  }
+  return asignado;
 }
 
 // ---------------------------------------------------------------- prescripcion
@@ -452,6 +538,10 @@ function recetar(e: EjercicioCatalogo, rol: Rol, r: Respuestas): EjercicioPlan {
     if (porLado) out.porLado = true;
     return out;
   };
+  if (rol === 'carrera') {
+    const receta = RECETA_CARRERA[e.id] ?? { series: 1, reps: [600, 900] as [number, number], descanso: 0 };
+    return base({ id: e.id, series: receta.series, reps: receta.reps, rirObjetivo: 0, incremento: 0, descanso: receta.descanso });
+  }
   if (rol === 'salto' || e.tipo === 'salto') {
     const reps: [number, number] = e.id === 'pogos' ? [15, 20] : e.id === 'salto-lateral-conos' ? [8, 10] : [3, 5];
     return base({ id: e.id, series: 3, reps, rirObjetivo: 0, incremento: 0 });
@@ -469,9 +559,6 @@ function recetar(e: EjercicioCatalogo, rol: Rol, r: Respuestas): EjercicioPlan {
   }
   if (rol === 'prevencion') {
     return base({ id: e.id, series: 2, reps: [10, 15], rirObjetivo: 2, incremento: incrementoDe(e, rol), rirFijo: 2 });
-  }
-  if (rol === 'condicion') {
-    return base({ id: e.id, series: 3, reps: [12, 15], rirObjetivo: 2, incremento: incrementoDe(e, rol), descanso: 45 });
   }
   if (rol === 'core') {
     return base({ id: e.id, series: r.experiencia === 'nuevo' ? 2 : 3, reps: [8, 12], rirObjetivo: 2, incremento: incrementoDe(e, rol) });
@@ -627,6 +714,11 @@ export function generarPrograma(respuestas: Respuestas, catalogo: EjercicioCatal
 
   const conCarga = (['mancuernas', 'barra', 'kettlebell', 'maquina', 'polea'] as Equipo[]).filter((x) => equipo.has(x));
   const orden = ordenarSemana(plantillasPara(dias.length, conCarga.length === 0), dias, partidos);
+  const carreras = repartirCarrera(
+    carreraDeLaSemana(r),
+    orden.map((p) => p.tipo),
+    dias.map((d) => partidos.has(d) || partidos.has((d + 1) % 7)),
+  );
 
   let saltoSiguiente = 0;
   const prevencionHecha = new Map<Patron, number>();
@@ -649,6 +741,11 @@ export function generarPrograma(respuestas: Respuestas, catalogo: EjercicioCatal
     const vispera = partidos.has((dia + 1) % 7);
     if (perfil?.lanzamiento && torso && !diaDePartido) sumar(perfil.lanzamiento, 'salto');
 
+    const carrera = carreras[n] ?? null;
+    // La velocidad va al inicio, con las piernas frescas; el fondo, al final.
+    if (carrera === 'velocidad') sumar(carrera, 'carrera');
+    const cupoDelDia = Math.max(3, cupo - (carrera ? tiempoQueOcupa(carrera, r.minutos) : 0));
+
     let cuenta = 0;
     for (const hueco of p.huecos) {
       if (hueco.rol === 'salto') {
@@ -658,7 +755,7 @@ export function generarPrograma(respuestas: Respuestas, catalogo: EjercicioCatal
         if (sumar(patron, 'salto')) saltoSiguiente += 1;
         continue;
       }
-      if (cuenta >= cupo) break;
+      if (cuenta >= cupoDelDia) break;
       // Si no hubo forma de evitarlo, la pierna de la vispera baja a volumen de accesorio.
       const suave = (diaDePartido || vispera) && hueco.rol === 'principal' && PATRONES_PIERNA.has(hueco.patron);
       if (sumar(hueco.patron, suave ? 'basico' : hueco.rol)) cuenta += 1;
@@ -685,7 +782,7 @@ export function generarPrograma(respuestas: Respuestas, catalogo: EjercicioCatal
         }
       }
     }
-    if (r.objetivo === 'grasa' && r.minutos >= 60) sumar('condicion', 'condicion');
+    if (carrera && carrera !== 'velocidad') sumar(carrera, 'carrera');
 
     const lugar = LUGAR_SESION[r.lugar];
     return {

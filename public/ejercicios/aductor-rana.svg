@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 240" width="360" height="240" role="img" aria-label="Cuatro apoyos con las rodillas abiertas y la espalda plana">
   <style>
-    .izq { font: 700 14px system-ui, sans-serif; fill: #1E6B48; text-anchor: start }
-    .der { font: 700 14px system-ui, sans-serif; fill: #1E6B48; text-anchor: end }
-    .cen { font: 700 14px system-ui, sans-serif; fill: #1E6B48; text-anchor: middle }
+    .izq { font: 700 14px system-ui, sans-serif; fill: #1D64B5; text-anchor: start }
+    .der { font: 700 14px system-ui, sans-serif; fill: #1D64B5; text-anchor: end }
+    .cen { font: 700 14px system-ui, sans-serif; fill: #1D64B5; text-anchor: middle }
     .mal { font: 700 14px system-ui, sans-serif; fill: #c4634f; text-anchor: middle }
     .pie { font: 400 13px system-ui, sans-serif; fill: #6f7c75; text-anchor: middle }
   </style>

@@ -1,41 +1,52 @@
 @import 'tailwindcss';
 
+/*
+ * Azzurra Fit: celeste de la camiseta (acento), azul marino del short y del
+ * logo del colegio (fondos y texto), dorado del escudo (records) y la franja
+ * tricolor como detalle.
+ */
 :root {
-  --c-ground: #f1f2ef;
+  --c-ground: #f2f5f9;
   --c-surface: #ffffff;
-  --c-surface2: #e8eae6;
+  --c-surface2: #e6ebf2;
   --c-field: #ffffff;
-  --c-ink: #181c19;
-  --c-ink2: #4c544e;
-  --c-ink3: #79817b;
-  --c-line: #d4d9d2;
-  --c-line2: #b9c0b7;
-  --c-accent: #1e6b48;
-  --c-accent-ink: #165237;
-  --c-accent-soft: #e1ede6;
+  --c-ink: #0f1b2d;
+  --c-ink2: #44526a;
+  --c-ink3: #75829a;
+  --c-line: #d3dae5;
+  --c-line2: #b5c0d0;
+  --c-accent: #1d64b5;
+  --c-accent-ink: #154f91;
+  --c-accent-soft: #e2edf9;
   --c-on-accent: #ffffff;
-  --c-warn: #a0431c;
-  --c-warn-soft: #f6e7df;
+  --c-gold: #b8871c;
+  --c-on-gold: #ffffff;
+  --c-warn: #b83227;
+  --c-warn-soft: #fbe7e5;
+  --c-verde: #009246;
+  --c-rojo: #ce2b37;
   color-scheme: light dark;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --c-ground: #101310;
-    --c-surface: #191d1a;
-    --c-surface2: #222722;
-    --c-field: #232823;
-    --c-ink: #e8ede8;
-    --c-ink2: #a6b0a8;
-    --c-ink3: #79837b;
-    --c-line: #2c322d;
-    --c-line2: #3c443e;
-    --c-accent: #54b98a;
-    --c-accent-ink: #7fd0a8;
-    --c-accent-soft: #182c22;
-    --c-on-accent: #0e1a14;
-    --c-warn: #e0906a;
-    --c-warn-soft: #2e2018;
+    --c-ground: #0a1220;
+    --c-surface: #111c2e;
+    --c-surface2: #182539;
+    --c-field: #1b2940;
+    --c-ink: #e8eef7;
+    --c-ink2: #a7b4c8;
+    --c-ink3: #7686a0;
+    --c-line: #22324a;
+    --c-line2: #31445f;
+    --c-accent: #5aa9ec;
+    --c-accent-ink: #8cc4f3;
+    --c-accent-soft: #13284a;
+    --c-on-accent: #071426;
+    --c-gold: #e5b94a;
+    --c-on-gold: #1a1204;
+    --c-warn: #ef7f73;
+    --c-warn-soft: #33191a;
   }
 }
 
@@ -58,6 +69,8 @@
   --color-on-accent: var(--c-on-accent);
   --color-warn: var(--c-warn);
   --color-warn-soft: var(--c-warn-soft);
+  --color-gold: var(--c-gold);
+  --color-on-gold: var(--c-on-gold);
 
   --spacing-tab: 60px;
 }
@@ -67,6 +80,10 @@
   body,
   #root {
     height: 100%;
+  }
+  /* Franja tricolor bajo la barra superior: el detalle de la camiseta. */
+  .tricolor {
+    background: linear-gradient(90deg, var(--c-verde) 0 33.33%, #ffffff 33.33% 66.66%, var(--c-rojo) 66.66% 100%);
   }
   body {
     margin: 0;

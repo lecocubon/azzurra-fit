@@ -80,7 +80,7 @@ jobs:
         run: |
           version=$(grep -oP 'versionName "\K[^"]+' android/app/build.gradle)
           codigo=$(grep -oP 'versionCode \K\d+' android/app/build.gradle)
-          nombre="arquero-$version.apk"
+          nombre="azzurra-fit-$version.apk"
           cp android/app/build/outputs/apk/release/app-release.apk "$nombre"
           echo "nombre=$nombre" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"

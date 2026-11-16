@@ -106,6 +106,7 @@ export default function App() {
   return (
     <>
       <header ref={cabecera} className="pad-top-safe sticky top-0 z-30 flex items-center gap-3 border-b border-line bg-surface px-3.5 pb-2.5">
+        <div aria-hidden="true" className="tricolor absolute inset-x-0 bottom-0 h-[3px]" />
         <h1 className="min-w-0 flex-1 truncate font-display text-[18px] leading-none font-bold tracking-[0.02em] uppercase">
           {programa.nombre}
           <small className="mt-1 block truncate font-sans text-[10.5px] font-normal tracking-[0.07em] text-ink3 uppercase">
