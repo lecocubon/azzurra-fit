@@ -57,8 +57,13 @@ export interface EjercicioCatalogo {
   movimiento?: string;
   /** Lo que sale mal cuando se hace de memoria. */
   errores?: string[];
-  /** Id en free-exercise-db (dominio publico). Solo lo usa scripts/imagenes.py. */
+  /**
+   * De donde salen las fotos: un id de free-exercise-db (dominio publico) o
+   * "wger:123,124" (wger.de). Lo usa scripts/imagenes.py.
+   */
   fuenteImagen?: string;
+  /** Autor y licencia de la imagen cuando la licencia pide nombrarlos. */
+  credito?: string;
   /** La imagen es un dibujo propio en public/ejercicios/<id>.svg, no una foto. */
   dibujo?: boolean;
   /** Cuadros del dibujo, en secuencia: <id>.svg, <id>-2.svg... Ausente = uno solo. */
@@ -122,6 +127,13 @@ export function soloSeMarca(tipo: TipoEjercicio): boolean {
 }
 
 export const BIBLIOTECA = datos as EjercicioCatalogo[];
+
+/** Cuantas fotos trae: dos (inicio y final) salvo una fuente de wger con una sola. */
+export function fotosDe(e: Pick<EjercicioCatalogo, 'fuenteImagen'>): number {
+  const f = e.fuenteImagen ?? '';
+  if (!f) return 0;
+  return f.startsWith('wger:') ? f.slice(5).split(',').length : 2;
+}
 
 export function nombreMusculo(m: Musculo): string {
   return MUSCULOS.find((x) => x.id === m)?.nombre ?? m;

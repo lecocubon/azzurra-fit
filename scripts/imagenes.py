@@ -3,6 +3,9 @@
 Uso: python scripts/imagenes.py
 Lee src/data/biblioteca.json y escribe en public/ejercicios dos fotos por
 ejercicio: <id>.webp (posicion inicial) y <id>-fin.webp (posicion final).
+
+Una fuente "wger:123" o "wger:123,124" baja de wger.de (CC BY-SA: el ejercicio
+lleva su `credito`); con un solo numero hay una sola foto.
 """
 import io
 import json
@@ -15,21 +18,39 @@ from PIL import Image
 
 RAIZ = Path(__file__).resolve().parent.parent
 BASE = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises"
+WGER = "https://wger.de/api/v2/exerciseimage"
 ANCHO = 360
 CALIDAD = 58
 # Numero de foto en la base -> sufijo del archivo.
 CUADROS = {0: "", 1: "-fin"}
 
 
+def url_de(fuente: str, cuadro: int) -> str | None:
+    """Direccion de la foto `cuadro` de esa fuente, o None si no la tiene."""
+    if not fuente.startswith("wger:"):
+        return f"{BASE}/{fuente}/{cuadro}.jpg"
+    ids = fuente[5:].split(",")
+    if cuadro >= len(ids):
+        return None
+    with urllib.request.urlopen(f"{WGER}/{ids[cuadro]}/", timeout=30) as r:
+        return json.load(r)["image"]
+
+
 def bajar(fuente: str, cuadro: int, salida: Path) -> bool:
     """Descarga y comprime una foto. False si esa foto no existe en la base."""
+    url = url_de(fuente, cuadro)
+    if url is None:
+        return False
     try:
-        with urllib.request.urlopen(f"{BASE}/{fuente}/{cuadro}.jpg", timeout=30) as r:
-            img = Image.open(io.BytesIO(r.read())).convert("RGB")
+        with urllib.request.urlopen(url, timeout=30) as r:
+            original = Image.open(io.BytesIO(r.read())).convert("RGBA")
     except urllib.error.HTTPError as e:
         if e.code == 404:
             return False
         raise
+    # Las de wger suelen ser PNG transparentes: van sobre blanco.
+    img = Image.new("RGB", original.size, "white")
+    img.paste(original, mask=original.getchannel("A"))
     alto = round(img.height * ANCHO / img.width)
     img.resize((ANCHO, alto), Image.LANCZOS).save(salida, "WEBP", quality=CALIDAD, method=6)
     return True

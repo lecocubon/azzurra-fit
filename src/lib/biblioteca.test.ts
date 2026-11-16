@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { BIBLIOTECA, catalogoPorId, filtrarBiblioteca, normalizarTexto } from '../data/biblioteca';
+import { BIBLIOTECA, catalogoPorId, filtrarBiblioteca, fotosDe, normalizarTexto } from '../data/biblioteca';
 import { PROGRAMA, PROGRAMA_BASE, PROGRAMA_MESO2, ejerciciosDelDia, resolverPrograma } from '../data/programa';
 
 describe('biblioteca', () => {
@@ -33,7 +33,7 @@ describe('biblioteca', () => {
     }
   });
 
-  it('cada ejercicio tiene imagen: dos fotos o un dibujo propio', () => {
+  it('cada ejercicio tiene imagen: sus fotos o un dibujo propio', () => {
     for (const e of BIBLIOTECA) {
       if (e.dibujo) {
         // Un dibujo en secuencia necesita todos sus cuadros: <id>.svg, <id>-2.svg...
@@ -44,7 +44,9 @@ describe('biblioteca', () => {
         continue;
       }
       expect(Boolean(e.fuenteImagen), `${e.id} sin imagen`).toBe(true);
-      for (const sufijo of ['', '-fin']) {
+      // Las de wger piden nombrar autor y licencia.
+      if (e.fuenteImagen?.startsWith('wger:')) expect(e.credito, `${e.id} sin credito`).toMatch(/wger\.de · CC/);
+      for (const sufijo of fotosDe(e) > 1 ? ['', '-fin'] : ['']) {
         expect(existsSync(`public/ejercicios/${e.id}${sufijo}.webp`), `${e.id}${sufijo}`).toBe(true);
       }
     }

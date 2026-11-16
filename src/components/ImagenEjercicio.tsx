@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { nombreMusculo, type EjercicioCatalogo } from '../data/biblioteca';
+import { fotosDe, nombreMusculo, type EjercicioCatalogo } from '../data/biblioteca';
 import { db } from '../db/db';
 import { useArquero } from '../estado/arquero';
 
@@ -109,21 +109,32 @@ export function FotosEjercicio({ ejercicio }: { ejercicio: EjercicioCatalogo | u
     );
   }
 
-  // Un dibujo de un solo cuadro ya muestra el movimiento completo.
-  if (propia || sinFinal || ejercicio?.dibujo || !ejercicio?.fuenteImagen) {
-    return <ImagenEjercicio ejercicio={ejercicio} tamano="grande" />;
+  // Algunas licencias piden nombrar al autor junto a la imagen.
+  const credito = !propia && ejercicio?.credito ? <p className="mt-1 text-center text-[11px] text-ink3">{ejercicio.credito}</p> : null;
+
+  // Un dibujo de un solo cuadro, o una fuente con una sola foto, ya muestra el movimiento.
+  if (propia || sinFinal || ejercicio?.dibujo || !ejercicio || fotosDe(ejercicio) < 2) {
+    return (
+      <>
+        <ImagenEjercicio ejercicio={ejercicio} tamano="grande" />
+        {credito}
+      </>
+    );
   }
 
   return (
-    <div className="grid grid-cols-2 gap-2">
-      <div>
-        <ImagenEjercicio ejercicio={ejercicio} tamano="grande" />
-        <p className={PIE}>Inicio</p>
+    <>
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <ImagenEjercicio ejercicio={ejercicio} tamano="grande" />
+          <p className={PIE}>Inicio</p>
+        </div>
+        <div>
+          <ImagenEjercicio ejercicio={ejercicio} tamano="grande" cuadro="fin" onFallo={() => setSinFinal(true)} />
+          <p className={PIE}>Final</p>
+        </div>
       </div>
-      <div>
-        <ImagenEjercicio ejercicio={ejercicio} tamano="grande" cuadro="fin" onFallo={() => setSinFinal(true)} />
-        <p className={PIE}>Final</p>
-      </div>
-    </div>
+      {credito}
+    </>
   );
 }

@@ -679,8 +679,8 @@ export function PantallaPrograma({ todas }: { todas: RegistroSerie[] }) {
           </button>
           <ListaEjercicios onElegir={(e) => setCapa({ ficha: e.id })} />
           <p className="mt-4 text-[12px] leading-relaxed text-ink3">
-            Fotos de la biblioteca: free-exercise-db, dominio público. Puedes reemplazar cualquiera por una tuya
-            desde la ficha.
+            Fotos de la biblioteca: free-exercise-db (dominio público) y wger.de (CC BY-SA, con el autor en cada
+            ficha). Puedes reemplazar cualquiera por una tuya desde la ficha.
           </p>
         </>
       )}
