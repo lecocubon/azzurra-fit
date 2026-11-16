@@ -161,6 +161,29 @@ export function TarjetaEjercicio({ semana, sesionId, ejercicio, registros, todas
     }
   };
 
+  /**
+   * Segundos del primer lado de una serie por lado que todavia no se marca:
+   * se lee del registro, asi sobrevive a cerrar la app entre un lado y otro.
+   */
+  const primerLado = (r: RegistroSerie | undefined): number | null =>
+    ejercicio.porLado && r && !r.hecha && (r.segundos ?? 0) > 0 ? (r.segundos ?? null) : null;
+
+  /**
+   * Al detener el cronometro: en un ejercicio por lado, el primero solo guarda
+   * ese lado y avisa; el segundo marca la serie y recien ahi parte el descanso.
+   * Queda el lado mas corto, que es lo que aguantaron los dos.
+   */
+  const terminarTiempo = async (serie: number, segundos: number, r: RegistroSerie | undefined) => {
+    const primero = primerLado(r);
+    if (ejercicio.porLado && primero === null) {
+      await guardarCampo(semana, sesionId, ejercicio.id, serie, 'segundos', segundos, tipoSerie);
+      avisar(`Lado 1: ${segundos} s. Ahora el otro lado`);
+      return;
+    }
+    await registrarTiempo(semana, sesionId, ejercicio.id, serie, primero === null ? segundos : Math.min(primero, segundos), tipoSerie);
+    await iniciarDescanso(descanso, ejercicio.id);
+  };
+
   // Primer kg anotado hoy (o la vez anterior), para abrir la calculadora con ese peso.
   const kgHoy =
     Array.from({ length: plan.series }, (_, i) => registros.get(idSerie(semana, sesionId, ejercicio.id, i + 1, tipoSerie))?.kg).find(
@@ -389,12 +412,11 @@ export function TarjetaEjercicio({ semana, sesionId, ejercicio, registros, todas
                         onCambio={(v) =>
                           void guardarCampo(semana, sesionId, ejercicio.id, serie, 'segundos', v, tipoSerie)
                         }
-                        onTerminar={(s) =>
-                          void registrarTiempo(semana, sesionId, ejercicio.id, serie, s, tipoSerie).then(() =>
-                            iniciarDescanso(descanso, ejercicio.id),
-                          )
-                        }
+                        onTerminar={(s) => void terminarTiempo(serie, s, r)}
                       />
+                      {primerLado(r) !== null && (
+                        <p className="mt-0.5 text-center text-[11px] font-medium text-accent-ink">Lado 1 listo · falta el otro</p>
+                      )}
                     </div>
                   ) : (
                     <>
