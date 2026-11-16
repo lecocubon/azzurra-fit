@@ -2,11 +2,12 @@
 
 Uso: python scripts/iconos.py   (necesita Pillow)
 
-Parte de scripts/logo-azzurra.webp, el escudo del equipo sobre fondo azul.
-Escribe el logo y el favicon de la web, los PNG de la PWA y los iconos y
-pantallas de carga de Android. Donde el sistema recorta en circulo o en
-forma libre (iconos adaptables, maskable), el logo se achica para que el
-escudo quede entero dentro de la zona segura.
+Parte de scripts/logo-azzurra.webp, el logo redondo del equipo con el fondo
+transparente (ocupa el 90 % de la imagen). Escribe el logo y el favicon de la
+web, los PNG de la PWA y los iconos y pantallas de carga de Android: la
+medalla va sobre el azul marino de la app y, donde el sistema recorta en
+circulo o en forma libre (iconos adaptables, maskable), se achica para que
+quede entera dentro de la zona segura.
 """
 from pathlib import Path
 
@@ -15,7 +16,7 @@ from PIL import Image, ImageDraw
 RAIZ = Path(__file__).resolve().parent.parent
 RES = RAIZ / "android/app/src/main/res"
 LOGO = Image.open(RAIZ / "scripts/logo-azzurra.webp").convert("RGBA")
-# El azul del borde del logo: rellena lo que queda alrededor cuando se achica.
+# Azul marino de la app: el fondo detras de la medalla.
 FONDO = "#002D84"
 
 
@@ -57,23 +58,23 @@ def pantalla_de_carga(ancho: int, alto: int) -> Image.Image:
 
 def main() -> None:
     publico = RAIZ / "public"
-    guardar(logo(512), publico / "logo.png")
-    guardar(recortar(logo(64), 0.22), publico / "favicon.png")
-    guardar(recortar(logo(192), 0.22), publico / "pwa-192.png")
-    guardar(recortar(logo(512), 0.22), publico / "pwa-512.png")
-    # Maskable: zona segura de 80 %; el escudo ocupa 87 % del logo.
-    guardar(logo(512, 0.88), publico / "pwa-maskable-512.png")
-    guardar(logo(180).convert("RGB"), publico / "apple-touch-icon.png")
+    guardar(logo(512, fondo=None), publico / "logo.png")
+    guardar(logo(64, fondo=None), publico / "favicon.png")
+    guardar(recortar(logo(192, 0.92), 0.22), publico / "pwa-192.png")
+    guardar(recortar(logo(512, 0.92), 0.22), publico / "pwa-512.png")
+    # Maskable: zona segura de 80 %.
+    guardar(logo(512, 0.86), publico / "pwa-maskable-512.png")
+    guardar(logo(180, 0.9).convert("RGB"), publico / "apple-touch-icon.png")
 
     # Android: icono clasico, redondo y la capa de adelante del adaptable
-    # (108 dp con 66 dp visibles: el escudo tiene que caber en ese circulo).
+    # (108 dp con 66 dp visibles: la medalla tiene que caber en ese circulo).
     densidades = {"mdpi": 1, "hdpi": 1.5, "xhdpi": 2, "xxhdpi": 3, "xxxhdpi": 4}
     for nombre, factor in densidades.items():
         carpeta = RES / f"mipmap-{nombre}"
         lado = round(48 * factor)
-        guardar(recortar(logo(lado, 0.94), 0.18), carpeta / "ic_launcher.png")
-        guardar(recortar(logo(lado, 0.76), None), carpeta / "ic_launcher_round.png")
-        guardar(logo(round(108 * factor), 0.62, fondo=None), carpeta / "ic_launcher_foreground.png")
+        guardar(recortar(logo(lado, 0.92), 0.18), carpeta / "ic_launcher.png")
+        guardar(recortar(logo(lado, 0.92), None), carpeta / "ic_launcher_round.png")
+        guardar(logo(round(108 * factor), 0.7, fondo=None), carpeta / "ic_launcher_foreground.png")
 
     for ruta in RES.glob("drawable*/splash.png"):
         actual = Image.open(ruta)
