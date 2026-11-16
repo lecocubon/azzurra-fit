@@ -217,7 +217,7 @@ export function Planificador({ previas, onCerrar }: Props) {
 
       {paso === 'inicio' && (
         <>
-          <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" className="mb-4 size-16" />
+          <img src={`${import.meta.env.BASE_URL}logo.png`} alt="" className="mb-4 size-20 rounded-2xl" />
           <p className="font-display text-[14px] font-bold tracking-[0.18em] text-accent uppercase">Azzurra Fit</p>
           <h3 className="mb-2 font-display text-[26px] leading-tight font-bold tracking-[0.02em] uppercase">Armemos tu rutina</h3>
           <p className="mb-3 text-[15px] leading-relaxed text-ink2">
